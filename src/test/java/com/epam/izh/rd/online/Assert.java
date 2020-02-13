@@ -15,4 +15,5 @@ public class Assert<T extends Throwable> {
     private Class<T> forName(String className) {
         return (Class<T>) Class.forName("com.epam.izh.rd.online.exception." + className);
     }
+
 }

@@ -1,6 +1,9 @@
 package com.epam.izh.rd.online.service;
 
 import com.epam.izh.rd.online.entity.User;
+import com.epam.izh.rd.online.exception.NotAccessException;
+import com.epam.izh.rd.online.exception.SimplePasswordException;
+import com.epam.izh.rd.online.exception.UserAlreadyRegisteredException;
 import com.epam.izh.rd.online.repository.IUserRepository;
 import com.epam.izh.rd.online.repository.UserRepository;
 
@@ -30,8 +33,19 @@ public class UserService implements IUserService {
      * @param user - даныне регистрирующегося пользователя
      */
     @Override
-    public User register(User user) {
+    public User register(User user) throws UserAlreadyRegisteredException, SimplePasswordException {
 
+        if (user.getLogin()=="" || user.getPassword()==""){
+            throw new IllegalArgumentException("Ошибка в заполнении полей");
+        } else if(userRepository.findByLogin(user.getLogin())!=null){
+
+                throw new UserAlreadyRegisteredException("Пользователь с логином " + user.getLogin() +" уже зарегистрирован");
+
+        } else if(user.getPassword().matches("\\W*\\d*\\W*")){
+
+                throw new SimplePasswordException("Пароль не соответствует требованиям безопасности");
+
+        }
         //
         // Здесь необходимо реализовать перечисленные выше проверки
         //
@@ -39,6 +53,9 @@ public class UserService implements IUserService {
         // Если все проверки успешно пройдены, сохраняем пользователя в базу
         return userRepository.save(user);
     }
+
+
+
 
     /**
      * Необходимо доработать данный метод следующим функционлом:
@@ -58,7 +75,16 @@ public class UserService implements IUserService {
      *
      * @param login
      */
-    public void delete(String login) {
+    public void delete(String login) throws NotAccessException {
+        if(login!="Admin"){
+            try {
+                throw new UnsupportedOperationException();
+            }
+            catch (UnsupportedOperationException e){
+
+                    throw new NotAccessException("Недостаточно прав для выполнения операции");
+            }
+        }
 
         // Здесь необходимо сделать доработку метод
 
@@ -67,5 +93,7 @@ public class UserService implements IUserService {
         // Здесь необходимо сделать доработку метода
 
     }
+
+
 
 }
